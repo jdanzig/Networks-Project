@@ -11,6 +11,10 @@ public class HTTPServer
 
         public static String[] parseReq (ArrayList req) { //need to parse incoming HTTP requests, make sure they're formatted, and respond
 		String reqType, reqHost, reqObj;
+		if (req.length()< 5){
+			System.out.println("The HTTP request was too short.");
+		}
+		
 		String firstLine = (String) req.get(0);
 		String [] splitReq = firstLine.split(" ");
 		reqType = splitReq[0];
@@ -43,10 +47,10 @@ public class HTTPServer
                         BufferedReader echoIn = new BufferedReader(new InputStreamReader(clientS.getInputStream()));)
             {
                 while ((input = echoIn.readLine()) != null) {
-                    System.out.println(input);
                     echoOut.println(input);
                     req.add(input);
                     if (input=="\n") { //hit a newline char. this is the gap between header and the actual HTTP request if the syntax is right
+						System.out.println("parsing");
                         input = echoIn.readLine();
                         req.add(input); //add the request body
                         parseReq(req);
