@@ -1,0 +1,5 @@
+.DEFAULT: all
+
+all:
+	ant
+
