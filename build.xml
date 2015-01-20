@@ -1,5 +1,5 @@
 <project default="usage" basedir=".">
-  <property name="projectNumber" value="0"/>
+  <property name="projectNumber" value="1"/>
   <property name="name" value="Project${projectNumber}"/>
   <property name="CNetID" value="jdanzig"/>
   <property name="author" value="Jonathan Danzig"/>
@@ -12,67 +12,35 @@
   <property name="build" location="build"/>
 
 
-  <path id="dependency.classpath">
-    <pathelement path="/usr/share/java/commons-cli-1.2.jar"/>
-  </path>
-  <fileset id="dependency.fileset" dir="/usr/share/java">
-    <include name="commons-cli-1.2.jar"/>
-  </fileset>
-
   <target name="init">
     <tstamp/>
     <mkdir dir="${build}/src"/>
   </target>
 
   <target name="compile" depends="init">
-    <unjar dest="${lib}">
-      <patternset>
-        <exclude name="**/META-INF/*"/>
-      </patternset>
-      <fileset refid="dependency.fileset"/>
-    </unjar>
     <javac srcdir="${src}" destdir="${build}" includeantruntime="false">
-      <classpath refid="dependency.classpath" />
+      <classpath>
+        <pathelement path="${lib}/commons-cli-1.2.jar"/>
+      </classpath>
     </javac>
   </target>
 
   <target name="dist" depends="compile">
-    <jar jarfile="project${projectNumber}.jar" index="true">
-      <fileset dir="${build}"/>
-      <fileset dir="${lib}"/>
+    <jar jarfile="project${projectNumber}.jar" index="true" basedir="${build}">
+      <manifest>
+        <attribute name="Main-Class" value="${packagePrefix}.proj${projectNumber}.HTTPServer" />
+      </manifest>
+      <zipgroupfileset dir="lib" includes="commons-cli-1.2.jar" />
     </jar>
   </target>
 
   <target name="usage" depends="dist">
-    <antcall>
-      <target name="server"/>
-      <target name="client"/>
-    </antcall>
+    <java fork="true" jar="project${projectNumber}.jar" />
   </target>
 
   <target name="clean">
     <delete dir="${build}"/>
     <delete file="project${projectNumber}.jar"/>
-  </target>
-
-  <target name="dist-clean" depends="clean">
-    <delete dir="${lib}"/>
-  </target>
-  
-  <target name="server">
-    <java fork="true" classname="${packagePrefix}.proj${projectNumber}.SimpleEchoServer">
-      <classpath>
-        <pathelement location="project${projectNumber}.jar"/>
-      </classpath>
-    </java>
-  </target>
-
-  <target name="client">
-    <java fork="true" classname="${packagePrefix}.proj${projectNumber}.SimpleEchoClient">
-      <classpath>
-        <pathelement location="project${projectNumber}.jar"/>
-      </classpath>
-    </java>
   </target>
 
 </project>
