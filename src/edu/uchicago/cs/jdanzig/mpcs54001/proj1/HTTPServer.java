@@ -23,15 +23,17 @@ public class HTTPServer
 			PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			Request req;
+			Response resp;
 			try {
 				req = new Request(in.readLine());
 				while(req.readHeader(in.readLine())) { }
+				resp = new Response(req);
+				resp.show(out);
 			} catch (HTTPErrorException exp) {
 				System.err.printf("Respond with HTTP Error: %i\n", exp.getHttpStatusCode());
-				//TODO: actually respond
+				resp = (req == null) ? new Response() : new Response(req);
+				resp.showError(out, exp);
 			}
-			//TODO: read values from req to determine how to proceed
-			//TODO: create new Response class
 		} catch (IOException x) {
 			System.err.printf("Exception: %s", x);
 		}
