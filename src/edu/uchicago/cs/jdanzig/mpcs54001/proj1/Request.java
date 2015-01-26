@@ -2,7 +2,7 @@ package edu.uchicago.cs.jdanzig.mpcs54001.proj1;
 
 import java.util.regex.*;
 import java.util.Hashtable;
-
+import java.io.*;
 
 public class Request {
 	private RequestMethod requestMethod;
@@ -45,7 +45,9 @@ public class Request {
 	}
 	
 	public boolean readHeader(String headerLine) throws HTTPErrorException {
-		if(headerLine.length() == 0) return false;
+		if(headerLine.length() == 0){
+			 return false;
+		 }
 		Matcher m = headerLinePattern.matcher(headerLine);
 		if(!m.matches()) {
 			System.err.printf("Invalid Header Transmitted: %s\n", headerLine);
