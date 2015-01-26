@@ -1,8 +1,8 @@
 <project default="usage" basedir=".">
   <property name="projectNumber" value="1"/>
   <property name="name" value="Project${projectNumber}"/>
-  <property name="CNetID" value="jdanzig"/>
-  <property name="author" value="Jonathan Danzig"/>
+  <property name="CNetID" value="jdanzig, jcbraun"/>
+  <property name="author" value="Jonathan Danzig, Cody Braun"/>
   <property name="institution" value="UChicago"/>
   <property name="course" value="MPCS 54001"/>
   <property name="packagePrefix" value="edu.uchicago.cs.jdanzig.mpcs54001"/>
