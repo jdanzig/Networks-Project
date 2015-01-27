@@ -16,7 +16,10 @@ public class HTTPServer
 	private static void listen(int port) {
 				
 		try {
-			ServerSocket server = new ServerSocket(port);
+						ServerSocket server = new ServerSocket(port);
+			while (true)
+			{
+
 			Socket client = server.accept();
 			PrintWriter out = new PrintWriter(client.getOutputStream(), true);		
 			BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -25,7 +28,7 @@ public class HTTPServer
 			try {
 
 				req = new Request(in.readLine());
-				while(req.readHeader(in.readLine())) { System.out.print ("reading");}
+				while(req.readHeader(in.readLine())) { }
 				resp = new Response(req);
 				resp.show(out);
 			
@@ -35,7 +38,7 @@ public class HTTPServer
 				resp.showError(out, exp);
 			}
 		}
-		
+	}
 		 catch (IOException x) {
 			System.err.printf("Exception: %s", x);
 		}

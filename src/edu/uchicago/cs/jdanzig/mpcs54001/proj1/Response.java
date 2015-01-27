@@ -5,13 +5,14 @@ import java.io.File;
 import java.util.Date;
 import java.io.*;
 
+
 public class Response {
 	private String path;
 	private Request req;
 	private int httpStatus;
 	
 	private Hashtable<String,String> headers;
-	
+	String redirectPath;
 	public Response(Request req) {
 		this.req = req;
 		this.headers = new Hashtable<String,String>();
@@ -22,48 +23,66 @@ public class Response {
 	}
 	
 	public void show(PrintWriter out) throws HTTPErrorException{
-		out.println("connected");
 		path = this.req.getPath();
+		Boolean redirects= Redirects.isRedirect(path);
+		if (redirects){
+			redirectPath = Redirects.getRedirect(path);
+		}
+		
 		path = "www/" + path;
 		File reqFile = new File (path);
 		String lineOut;
-		if (reqFile.exists()){
+		if (reqFile.exists() && path!= "www/redirect.defs"){
 			this.httpStatus = 200;
+			headers.put("HTTP/1.1", "200");
+			try{
+			headers.put("Content-Type", MimeTypeDetector.getContentType(reqFile));	
+			}
+				catch (IOException x)
+			{ }
 		}
 		else
 		{
-			this.httpStatus = 404;
+			if (!redirects){
+				this.httpStatus = 404;
+				headers.put("HTTP/1.1", "404");
+			}
+			else
+			{
+				this.httpStatus = 301;
+				headers.put("HTTP/1.1", "301");
+				headers.put("Location", redirectPath);
+			}
 		}
-		Date date = new Date();
-		out.println("HTTP/1.1 " + this.httpStatus + " OK");
-		out.println("connection: close");
-		out.println("Date: " + date.toString());	
-		try{
-		out.println("Content-Type: " + MimeTypeDetector.getContentType(reqFile));	
-	}
-		catch (IOException x)
-	{
-	System.out.printf("Hit exception: %s", x);	
-	}
 	
-		out.println("Server: Jon and Cody's server \r\n");
-		if (req.getRequestMethod()=="GET"){
-			try{
-			BufferedReader fileReader = new BufferedReader (new FileReader (reqFile));
-			
-			while ((lineOut=fileReader.readLine())!=null){
-			out.println(lineOut);
-			}
-			}
-			catch(IOException e){
-			}
+    //print the key-value pairs of headers
+    out.print("\r");
+	if (headers.containsKey("HTTP/1.1")) { 
+		out.println("HTTP/1.1: " + headers.get("HTTP/1.1"));
 		}
-		// TODO: Populate headers. Print out headers. Return at this point if req.responseType == ResponseType.HEAD
-		// TODO: Otherwise, print out contents of file, then return
+	if (headers.containsKey("Location")) { 
+		out.println("Location: " + headers.get("Location"));
+		}
+	if (headers.containsKey("Content-Type")) { 
+		out.println("Content-Type: " + headers.get("Content-Type")); 
+		}
+	out.println("connection: close");
+	Date date = new Date();
+	out.println("Date: " + date.toString());
+			if (req.getRequestMethod()=="GET"){
+				try{
+					out.print("\r\n");
+					BufferedReader fileReader = new BufferedReader (new FileReader (reqFile));
+					while ((lineOut=fileReader.readLine())!=null){
+						out.println(lineOut);
+					}
+				}
+				catch(IOException e){
+				}
+			}	
 	}
 	public void showError(PrintWriter out, HTTPErrorException exp) {
-		// TODO: Reply with error response corresponding to the httpStatus in exp
-		// TODO: Populate headers. Print out headers. Return at this point if req.responseType == ResponseType.HEAD
-		// TODO: Otherwise, print out contents of error page, then return
+		out.println("HTTP/1.1: " + exp.getHttpStatusCode());
+		// Not sure if we need to return content explaining the errors, I'll look at some sample requests
 	}
 }
