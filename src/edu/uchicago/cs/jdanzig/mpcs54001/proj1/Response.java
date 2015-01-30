@@ -1,4 +1,4 @@
-pckage edu.uchicago.cs.jdanzig.mpcs54001.proj1;
+package edu.uchicago.cs.jdanzig.mpcs54001.proj1;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Hashtable;
@@ -47,22 +47,24 @@ public class Response {
 		}
 	}
 	
-	private void writeHeaders(PrintWriter out) {
+	private void writeHeaders(StringBuffer tempOut) {
 		for(String headerName : this.headers.keySet()) {	
-			out.printf("%s: %s\r\n", headerName, this.headers.get(headerName));
+			tempOut.append(String.format("%s: %s\r\n", headerName, this.headers.get(headerName)));
 		}	
-		out.print("\r\n");
+		tempOut.append("\r\n");
 	}
 	
-	private void writeContent(PrintWriter out, File f) throws IOException {
+	private void writeContent(StringBuffer tempOut, File f) throws IOException {
 		String lineOut;
 		BufferedReader fileReader = new BufferedReader(new FileReader(f));
 		while ((lineOut = fileReader.readLine()) != null){
-			out.println(lineOut);
+			tempOut.append(lineOut);
 		}
+		tempOut.append("\r\n");
 	}
 	
 	public void show(PrintWriter out) throws HTTPErrorException {
+		StringBuffer tempOut = new StringBuffer ("");
     // This function is almost done.
     // The only thing that needs to be added is HTTP responses
     //   that are successful (This function only deals with successful responses)
@@ -78,20 +80,34 @@ public class Response {
 		File reqFile = new File(path);
 		if (!reqFile.exists() || this.path == "www/redirect.defs") throw new HTTPErrorException(404);
 		addContentTypeHeader(reqFile);
-		writeHeaders(out);
+		tempOut.append(String.format("HTTP/%f 200 OK \r\n", req.getHttpVersion()));
+		writeHeaders(tempOut);
 		
 		try {
-			if (req.getRequestMethod() == "GET") writeContent(out, reqFile);
+			if (req.getRequestMethod() == "GET") writeContent(tempOut, reqFile);
 		} catch(IOException e) {
 			throw new HTTPErrorException(500);
+		}	
+		
+		try {
+			//filled StringBuffer, now try and print it to out
+			out.println("");
+			out.println(tempOut);
+		}
+		catch(Exception e) {
+			showError(out, new HTTPErrorException(500));
 		}	
 	}
 	
 	public void showError(PrintWriter out, HTTPErrorException exp) {
-		out.println("HTTP/1.1: " + exp.getHttpStatusCode());
+	StringBuffer tempOut = new StringBuffer("");
+	
+	tempOut.append(String.format("HTTP/%f", req.getHttpVersion()));
+	tempOut.append(String.format("%i", exp.getHttpStatusCode()));
+	out.println(tempOut);
+	
 		// Return first line in this format HTTP/1.x 404 NOT FOUND
     // What words to include for which status code (IN ALL CAPS)
     // http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml#http-status-codes-1
-    // Not sure if we need to return content explaining the errors, I'll look at some sample requests --status codes in the 400s and 500s normally have some sort of webpage error message
 	}
 }
