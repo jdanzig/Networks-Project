@@ -1,19 +1,21 @@
 package edu.uchicago.cs.jdanzig.mpcs54001.proj1;
+import java.util.HashMap; 
 
-public enum ResponseCode {
-	OK(200, "OK"), 
-	MOVED_PERMANENTLY(301, "MOVED PERMANENTLY"),
-	FORBIDDEN(404, "FORBIDDEN"),
-	INTERNAL_SERVER_ERROR(500, "INTERNAL SERVER ERROR"),
-	BAD_REQUEST(400, "BAD REQUEST"),
-	MALFORMED_PATH(406, "MALFORMED PATH NAME");
-
-	private int codeValue;
-	private String codeString;
+public class ResponseCode {
 	
-	private ResponseCode(int codeValue, String codeString) {
-		this.codeValue = codeValue;
-		this.codeString = codeString;
+	HashMap<Integer, String> lookup = new HashMap<Integer, String>();{
+	lookup.put(200, "OK");
+	lookup.put(301, "MOVED PERMANENTLY");
+	lookup.put(404, "FORBIDDEN");
+	lookup.put(500, "INTERNAL SERVER ERROR");
+	lookup.put(501, "INVALID REQUEST");
+	lookup.put(400, "BAD REQUEST");
+	lookup.put(406, "MALFORMED PATH NAME");}
+
+	public String getCode(int codeNum){
+		return lookup.get(codeNum);
 		
 	}
+	
+	
 }

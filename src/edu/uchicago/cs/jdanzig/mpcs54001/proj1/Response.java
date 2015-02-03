@@ -22,6 +22,7 @@ public class Response {
 	}
 	
 	public Response() {
+		
 		this.headers = new Hashtable<String,String>();
 		headers.put("Connection", "Close");
 		headers.put("Date", new Date().toString());
@@ -30,10 +31,7 @@ public class Response {
 	private boolean handleRedirect(PrintWriter out) throws HTTPErrorException {
 		this.path = this.req.getPath();
 		if (Redirects.isRedirect(this.path)) {
-			headers.put("Location", Redirects.getRedirect(this.path));
-			//TODO: Figure out a way to throw an exception here
-      // (but still preserve the target location)
-			//showError(out, new HTTPErrorException(301));
+			showError(out, new HTTPErrorException(301, Redirects.getRedirect(this.path), req.getHttpVersion()));
 			return true;
 		}
 		return false;
@@ -57,33 +55,34 @@ public class Response {
 	private void writeContent(StringBuffer tempOut, File f) throws IOException {
 		String lineOut;
 		BufferedReader fileReader = new BufferedReader(new FileReader(f));
+		if (!MimeTypeDetector.getContentType(f).contains("text")){
+			ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+			while ((lineOut = fileReader.readLine()) != null){
+				outByteStream.write(lineOut.getBytes());
+			}
+			tempOut.append(outByteStream.toString() + "\r\n");
+			System.out.print("this");
+		}
+		else
+		{
 		while ((lineOut = fileReader.readLine()) != null){
 			tempOut.append(lineOut);
 		}
 		tempOut.append("\r\n");
+		}
 	}
 	
 	public void show(PrintWriter out) throws HTTPErrorException {
+		
 		StringBuffer tempOut = new StringBuffer ("");
-    // This function is almost done.
-    // The only thing that needs to be added is HTTP responses
-    //   that are successful (This function only deals with successful responses)
-    // return HTTP/1.1 200 OK as their first line
-    // The problem we have is that we don't know if the status will be 200..
-    //   until we go through all the steps below
-    // So what we're going to need to do is, instead of writing data directly to the client with out, we need to use a java.lang.StringBuffer to hold the response, and only print the response to out at the very end of the show function.
-    // This way, if an error gets thrown in the show function, we can abandon the string buffer that contain the partial output, and go directly to printing the error message without screwing up our response.
-    // Note that when sending http/1.1 200 OK to the browser, you are saying that you are using http protocol 1.1. This version must match the http versison given by the client when they made their request.
-    // Check the varibale req to get the http version number
+		try {
     if(handleRedirect(out)) return;
 		this.path = "www/" + this.path;
 		File reqFile = new File(path);
-		if (!reqFile.exists() || this.path == "www/redirect.defs") throw new HTTPErrorException(404);
+		if (!reqFile.exists() || this.path == "www/redirect.defs") throw new HTTPErrorException(404, req.getHttpVersion());
 		addContentTypeHeader(reqFile);
-		tempOut.append(String.format("HTTP/%f 200 OK \r\n", req.getHttpVersion()));
+		tempOut.append(String.format("HTTP/%.1f 200 OK \r\n", req.getHttpVersion()));
 		writeHeaders(tempOut);
-		
-		try {
 			if (req.getRequestMethod() == "GET") writeContent(tempOut, reqFile);
 		} catch(IOException e) {
 			throw new HTTPErrorException(500);
@@ -100,14 +99,16 @@ public class Response {
 	}
 	
 	public void showError(PrintWriter out, HTTPErrorException exp) {
+
 	StringBuffer tempOut = new StringBuffer("");
-	
-	tempOut.append(String.format("HTTP/%f", req.getHttpVersion()));
-	tempOut.append(String.format("%i", exp.getHttpStatusCode()));
+	ResponseCode rc = new ResponseCode();
+	tempOut.append(String.format("HTTP/%.1f \r\n", exp.getVersion()));
+	tempOut.append(String.format("%d %s \r\n", exp.getHttpStatusCode(), rc.getCode(exp.getHttpStatusCode())));
+	if (exp.getHttpStatusCode()==301){
+		tempOut.append(String.format("Location: %s \r\n", exp.getPath()));
+	}
+	out.println("");
 	out.println(tempOut);
-	
-		// Return first line in this format HTTP/1.x 404 NOT FOUND
-    // What words to include for which status code (IN ALL CAPS)
     // http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml#http-status-codes-1
 	}
 }

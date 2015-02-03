@@ -18,13 +18,13 @@ public class Request {
 		Matcher m = requestLinePattern.matcher(requestLine);
 		if(!m.matches()) { 
 			System.err.printf("Could not parse request line: %s\n", requestLine);
-			throw new HTTPErrorException(400);
+			throw new HTTPErrorException(400, httpVersion);
 		}
 		try {
 			requestMethod = RequestMethod.valueOf(m.group(1));
 		} catch (IllegalArgumentException exp) {
 			System.err.printf("Invalid request method: %s\n", m.group(1));
-			throw new HTTPErrorException(501);
+			throw new HTTPErrorException(501, httpVersion);
 		}
 		try {
 			path = m.group(2);
@@ -33,13 +33,13 @@ public class Request {
 			if(!pathMatcher.matches()) throw new IllegalArgumentException(path);
 		} catch (IllegalArgumentException exp) {
 			System.err.printf("Malformed Pathname: %s\n", m.group(2));
-			throw new HTTPErrorException(406); 
+			throw new HTTPErrorException(406, httpVersion); 
 		}
 		try {
 			httpVersion = Float.parseFloat(m.group(3));
 		} catch (NumberFormatException exp) {
 			System.err.printf("Invalid HTTP Version: %s\n", m.group(3));
-			throw new HTTPErrorException(505); 
+			throw new HTTPErrorException(505, httpVersion); 
 		}
 		headers = new Hashtable<String,String>();
 	}
@@ -51,7 +51,7 @@ public class Request {
 		Matcher m = headerLinePattern.matcher(headerLine);
 		if(!m.matches()) {
 			System.err.printf("Invalid Header Transmitted: %s\n", headerLine);
-			throw new HTTPErrorException(400); 
+			throw new HTTPErrorException(400, httpVersion); 
 		}
 		headers.put(m.group(1).trim().toLowerCase(), m.group(2).trim());
 		return true;

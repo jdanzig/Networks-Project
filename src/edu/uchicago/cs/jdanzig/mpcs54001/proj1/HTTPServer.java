@@ -19,21 +19,20 @@ public class HTTPServer
 						ServerSocket server = new ServerSocket(port);
 			while (true)
 			{
-
 			Socket client = server.accept();
 			PrintWriter out = new PrintWriter(client.getOutputStream(), true);		
 			BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			Request req = null;
 			Response resp;	
 			try {
-
 				req = new Request(in.readLine());
 				while(req.readHeader(in.readLine())) { }
 				resp = new Response(req);
 				resp.show(out);
+				client.close();
 			
 			} catch (HTTPErrorException exp) {
-				System.err.printf("Respond with HTTP Error: %i\n", exp.getHttpStatusCode());
+				System.err.printf("Respond with HTTP Error: %d\n", exp.getHttpStatusCode());
 				resp = (req == null) ? new Response() : new Response(req);
 				resp.showError(out, exp);
 			}
