@@ -1,8 +1,5 @@
 package edu.uchicago.cs.jdanzig.mpcs54001.proj1;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -20,7 +17,7 @@ public class HTTPServer
 			while (true)
 			{
 			Socket client = server.accept();
-			PrintWriter out = new PrintWriter(client.getOutputStream(), true);		
+			DataOutputStream out = new DataOutputStream(client.getOutputStream());	
 			BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			Request req = null;
 			Response resp;	
@@ -41,9 +38,6 @@ public class HTTPServer
 		 catch (IOException x) {
 			System.err.printf("Exception: %s", x);
 		}
-	
 	}
-
-
 }
 
