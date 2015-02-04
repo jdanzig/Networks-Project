@@ -7,19 +7,6 @@ public class HTTPErrorException extends Exception {
 	private float version;
 	private String path;
 	
-	public HTTPErrorException(int statusCode, String pathString, float HTTPversion) {
-		super("HTTP Status " + statusCode, null, true, false);
-		httpStatus = statusCode;
-		version = HTTPversion;
-		path = pathString;
-	}
-	
-	public HTTPErrorException(int statusCode, float HTTPversion) {
-		super("HTTP Status " + statusCode, null, true, false);
-		httpStatus = statusCode;
-		version = HTTPversion;
-	}
-	
 	public HTTPErrorException(int statusCode) {
 		super("HTTP Status " + statusCode, null, true, false);
 		httpStatus = statusCode;
