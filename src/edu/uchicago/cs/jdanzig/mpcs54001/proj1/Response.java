@@ -80,11 +80,14 @@ public class Response {
 		try {
 			if (handleRedirect(out))
 				return;
-			this.path = "www/" + this.path;
+			this.path = "www" + this.path;
 			File reqFile = new File(path);
-
-			if (!reqFile.exists() || this.path == "www/redirect.defs")
-				throw new HTTPErrorException(404);
+			System.out.print(path);
+			if (this.path.equals("www/redirect.defs") || (!reqFile.exists())){
+				System.out.print("1");
+				showError(out, new HTTPErrorException(404));
+				return;
+			}
 			addContentTypeHeader(reqFile);
 			tempOut.append(String.format("HTTP/1.1 200 OK \r\n")); //Just return highest compatible HTTP version
 			writeHeaders(tempOut);
@@ -92,7 +95,8 @@ public class Response {
 				writeContent(tempOut, dataOut, reqFile);
 			}
 		} catch (IOException e) {
-			throw new HTTPErrorException(500);
+			showError(out, new HTTPErrorException(500));
+			return;
 		}
 
 		try {
@@ -118,10 +122,10 @@ public class Response {
 			out.writeBytes(tempOut.toString());
 			dataOut.writeTo(out);
 		} catch (IOException x) {
-			showError(out, new HTTPErrorException(500));
+			//showError(out, new HTTPErrorException(500));
 		}
 		catch(HTTPErrorException y){
-			showError(out, new HTTPErrorException(500));
+			//showError(out, new HTTPErrorException(500));
 		}
 		}
 }

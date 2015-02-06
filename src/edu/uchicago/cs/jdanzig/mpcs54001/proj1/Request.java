@@ -19,15 +19,14 @@ public class Request {
 	public Request(String requestLine) throws HTTPErrorException {
 		Matcher m = requestLinePattern.matcher(requestLine);
 		if (!m.matches()) {
-			System.err
-					.printf("Could not parse request line: %s\n", requestLine);
+			System.err.printf("Could not parse request line: %s\n", requestLine);
 			throw new HTTPErrorException(400);
 		}
 		try {
 			requestMethod = RequestMethod.valueOf(m.group(1));
 		} catch (IllegalArgumentException exp) {
 			System.err.printf("Invalid request method: %s\n", m.group(1));
-			throw new HTTPErrorException(501);
+			throw new HTTPErrorException(403);
 		}
 		try {
 			path = m.group(2);

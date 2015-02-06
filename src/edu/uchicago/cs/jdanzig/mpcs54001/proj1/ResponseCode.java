@@ -7,6 +7,7 @@ public class ResponseCode {
 	lookup.put(200, "OK");
 	lookup.put(301, "MOVED PERMANENTLY");
 	lookup.put(404, "FORBIDDEN");
+	lookup.put(403, "FORBIDDEN ");
 	lookup.put(500, "INTERNAL SERVER ERROR");
 	lookup.put(501, "INVALID REQUEST");
 	lookup.put(400, "BAD REQUEST");
