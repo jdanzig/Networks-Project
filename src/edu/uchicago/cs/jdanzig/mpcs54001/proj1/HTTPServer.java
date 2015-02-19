@@ -11,6 +11,6 @@ public class HTTPServer{
 		Listener HTTPListener = new Listener();
 		Listener HTTPSListener = new Listener();
 		HTTPListener.run(options.port, false);
-		HTTPSListener.run(options.port, false);
+		HTTPSListener.run(options.securePort, true);
 	}
 }
