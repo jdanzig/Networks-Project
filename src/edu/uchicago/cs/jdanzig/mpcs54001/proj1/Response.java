@@ -16,7 +16,7 @@ public class Response {
 	public Response(Request req) {
 		this.req = req;
 		this.headers = new Hashtable<String, String>();
-		headers.put("Connection", req.getConnectionMethod());
+		headers.put("Connection", req.persist() ? "Keep-Alive" : "Close");
 		headers.put("Date", new Date().toString());
 	}
 

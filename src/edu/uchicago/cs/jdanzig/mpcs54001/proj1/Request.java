@@ -71,17 +71,15 @@ public class Request {
 		return requestMethod.toString();
 	}
 	
-	public String getConnectionMethod() {
-		if (headers.containsKey("Connection")){
-		connectionMethod = ConnectionMethod.valueOf(headers.get("Connection"));
-		System.out.print("here");
+	public boolean persist() {
+		System.out.print(this.headers.get("connection"));
+		if (headers.containsKey("connection") & headers.get("connection")=="Keep-Alive"){
+			return true;
 		}
-		else
-		{
-			connectionMethod = ConnectionMethod.valueOf("Close");
+		else{
+			return false;
 		}
 		
-		return connectionMethod.toString();
 	}
 
 	public String getPath() {
