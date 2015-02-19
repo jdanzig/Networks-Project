@@ -1,6 +1,7 @@
 package edu.uchicago.cs.jdanzig.mpcs54001.proj1;
 
 import java.io.*;
+import javax.net.ssl.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -11,10 +12,11 @@ public class HTTPServer {
 	}
 
 	private static void listen(int port) {
-
+		boolean running;
+		running = true;
 		try {
 			ServerSocket server = new ServerSocket(port);
-			while (true) {
+			while (running) {
 				Socket client = server.accept();
 				DataOutputStream out = new DataOutputStream(
 						client.getOutputStream());
@@ -28,7 +30,9 @@ public class HTTPServer {
 					}
 					resp = new Response(req);
 					resp.show(out);
+					if (req.getConnectionMethod()=="Close"){
 					client.close();
+					}
 
 				} catch (HTTPErrorException exp) {
 					System.err.printf("Respond with HTTP Error: %d\n",

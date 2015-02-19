@@ -6,6 +6,7 @@ import java.io.*;
 
 public class Request {
 	private RequestMethod requestMethod;
+	private ConnectionMethod connectionMethod;
 	private String path;
 	private Hashtable<String, String> headers;
 	private float httpVersion;
@@ -18,6 +19,7 @@ public class Request {
 
 	public Request(String requestLine) throws HTTPErrorException {
 		Matcher m = requestLinePattern.matcher(requestLine);
+		
 		if (!m.matches()) {
 			System.err.printf("Could not parse request line: %s\n", requestLine);
 			throw new HTTPErrorException(400);
@@ -67,6 +69,19 @@ public class Request {
 
 	public String getRequestMethod() {
 		return requestMethod.toString();
+	}
+	
+	public String getConnectionMethod() {
+		if (headers.containsKey("Connection")){
+		connectionMethod = ConnectionMethod.valueOf(headers.get("Connection"));
+		System.out.print("here");
+		}
+		else
+		{
+			connectionMethod = ConnectionMethod.valueOf("Close");
+		}
+		
+		return connectionMethod.toString();
 	}
 
 	public String getPath() {

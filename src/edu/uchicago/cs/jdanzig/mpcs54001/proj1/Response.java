@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 
 public class Response {
 	private String path;
+	private boolean persistence;
 	private Request req;
 	private int httpStatus;
 	private Hashtable<String, String> headers;
@@ -15,13 +16,13 @@ public class Response {
 	public Response(Request req) {
 		this.req = req;
 		this.headers = new Hashtable<String, String>();
-		headers.put("Connection", "Close");
+		headers.put("Connection", req.getConnectionMethod());
 		headers.put("Date", new Date().toString());
 	}
 
 	public Response() {
 		this.headers = new Hashtable<String, String>();
-		headers.put("Connection", "Close");
+		headers.put("Connection", "Closed");
 		headers.put("Date", new Date().toString());
 	}
 
@@ -107,7 +108,7 @@ public class Response {
 			showError(out, new HTTPErrorException(500));
 		}
 	}
-
+	
 	public void showError(DataOutputStream out, HTTPErrorException exp) {
 		StringBuffer tempOut = new StringBuffer("");
 		ByteArrayOutputStream dataOut = new ByteArrayOutputStream(2000);
