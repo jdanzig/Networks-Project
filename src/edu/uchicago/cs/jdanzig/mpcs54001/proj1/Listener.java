@@ -6,16 +6,40 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.*;
 
 public class Listener implements Runnable {
 	
 	public static void run (int port, boolean secure) {
+		ServerSocket server;
+		Socket client;
+		client = null;
 		boolean running;
 		running = true;
+		try{
+			
+		if (secure){ //use SSL
+			SSLServerSocketFactory sslFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+			server = sslFactory.createServerSocket(port);
+			client = server.accept();
+			SSLSession sslSession = ((SSLSocket)client).getSession();
+			
+		}
+		else { //server is a regular old socket port, not using SSL
+			server = new ServerSocket(port);
+			client = server.accept();
+		}
+		
+		}
+		 catch (IOException x) {
+		System.err.printf("Exception: %s", x);
+	}
+			
 		try {
-			ServerSocket server = new ServerSocket(port);
 			while (running) {
-				Socket client = server.accept();
+				
 				DataOutputStream out = new DataOutputStream(
 						client.getOutputStream());
 				BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -43,6 +67,5 @@ public class Listener implements Runnable {
 		} catch (IOException x) {
 			System.err.printf("Exception: %s", x);
 		}
+		}
 	}
-
-}
