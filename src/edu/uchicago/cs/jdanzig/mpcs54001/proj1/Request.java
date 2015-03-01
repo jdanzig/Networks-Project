@@ -72,8 +72,7 @@ public class Request {
 	}
 	
 	public boolean persist() {
-		System.out.print(this.headers.get("connection"));
-		if (headers.containsKey("connection") & headers.get("connection")=="Keep-Alive"){
+		if (this.headers.containsKey("connection") && this.headers.get("connection").matches("keep-alive")){
 			return true;
 		}
 		else{

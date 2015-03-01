@@ -83,9 +83,7 @@ public class Response {
 				return;
 			this.path = "www" + this.path;
 			File reqFile = new File(path);
-			System.out.print(path);
 			if (this.path.equals("www/redirect.defs") || (!reqFile.exists())){
-				System.out.print("1");
 				showError(out, new HTTPErrorException(404));
 				return;
 			}
