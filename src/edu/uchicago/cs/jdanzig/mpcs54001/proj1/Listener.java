@@ -4,11 +4,13 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 import javax.net.ssl.*;
+
+import java.security.*;
 
 public class Listener extends Thread {
 	
@@ -23,10 +25,19 @@ public class Listener extends Thread {
 		ServerSocket server;
 		Socket client;
 		SSLSession sslSession;
+		String password = "codyjon";
+		
 		try{
 			if (this.secure){ //use SSL
-				SSLServerSocketFactory sslFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+				KeyStore store = KeyStore.getInstance("JKS");
+				store.load(new FileInputStream("./server.jks"), password.toCharArray());
+				KeyManagerFactory factory = KeyManagerFactory.getInstance("SunX509");
+				factory.init(store, password.toCharArray());
+				SSLContext context = SSLContext.getInstance("SSL");
+				context.init(factory.getKeyManagers(), null, null);
+				SSLServerSocketFactory sslFactory = context.getServerSocketFactory();
 				server = sslFactory.createServerSocket(this.port);
+				
 			} else { //server is a regular old socket port, not using SSL
 				server = new ServerSocket(this.port);
 			}
@@ -55,7 +66,22 @@ public class Listener extends Thread {
 				}
 			}
 		} catch (IOException x) {
-			System.err.printf("Exception: %s", x);
+			System.err.printf("1Exception: %s", x);
+		}
+		catch (UnrecoverableKeyException x) {
+		System.err.printf("2Exception: %s", x);
+		}
+		catch (CertificateException x) {
+			System.err.printf("3Exception: %s", x);
+			}
+		catch (KeyStoreException x) {
+			System.err.printf("4Exception: %s", x);
+		}
+		catch (KeyManagementException x) {
+			System.err.printf("5Exception: %s", x);
+		}
+		catch (NoSuchAlgorithmException x) {
+			System.err.printf("6Exception: %s", x);
 		}
 	}
 }
