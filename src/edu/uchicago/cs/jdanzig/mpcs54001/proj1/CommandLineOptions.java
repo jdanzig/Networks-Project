@@ -14,10 +14,10 @@ public class CommandLineOptions {
 		if(options == null) {
 			options = new Options();
 			Option httpPortOption = new Option("p", "serverPort", true, "HTTP port to listen on");
-			httpPortOption.setRequired(true);
+			//httpPortOption.setRequired(true);
 			options.addOption(httpPortOption);
 			Option httpsPortOption = new Option("sp", "sslServerPort", true, "HTTPS port to listen on");
-			httpsPortOption.setRequired(true);
+			//httpsPortOption.setRequired(true);
 			options.addOption(httpsPortOption);
 		}
 		return options;
@@ -31,12 +31,14 @@ public class CommandLineOptions {
 			help();
 		} 
 		try {
-			port = Integer.parseInt(line.getOptionValue("serverPort"));
+			if (line.getOptionValue("serverPort") != "")
+				port = Integer.parseInt(line.getOptionValue("serverPort"));
 		} catch (NumberFormatException exp) {
 			System.err.printf("Invalid port: %s", line.getOptionValue("serverPort"));
 		}
 		try {
-			sslPort = Integer.parseInt(line.getOptionValue("sslServerPort"));
+			if (line.getOptionValue("sslServerPort") != "")
+				sslPort = Integer.parseInt(line.getOptionValue("sslServerPort"));
 		} catch (NumberFormatException exp) {
 			System.err.printf("Invalid SSL port: %s", line.getOptionValue("sslServerPort"));
 		}

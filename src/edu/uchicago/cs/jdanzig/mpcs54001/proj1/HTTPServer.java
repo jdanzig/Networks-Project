@@ -7,13 +7,15 @@ import java.net.Socket;
 public class HTTPServer{
 	public static void main(String[] args) {
 		CommandLineOptions options = new CommandLineOptions(args);
-			if (options.port != 0){
-				Listener HTTPListener = new Listener(options.port,false);
-				HTTPListener.start();
-			}
-			if (options.sslPort != 0){
-				Listener HTTPSListener = new Listener(options.sslPort,true);
-				HTTPSListener.start();
-			}
+
+		if (options.port >= 1024) {
+			Listener HTTPListener = new Listener(options.port,false);
+			HTTPListener.start();	
+		}
+		if (options.sslPort >= 1024 ) {
+			Listener HTTPSListener = new Listener(options.sslPort,true);
+			HTTPSListener.start();
+		}
+
 	}
 }
