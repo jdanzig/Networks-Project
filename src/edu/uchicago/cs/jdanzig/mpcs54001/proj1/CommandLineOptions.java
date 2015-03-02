@@ -31,16 +31,20 @@ public class CommandLineOptions {
 			help();
 		} 
 		try {
-			if (line.getOptionValue("serverPort") != "")
+			if (line.getOptionValue("serverPort") != null)
 				port = Integer.parseInt(line.getOptionValue("serverPort"));
 		} catch (NumberFormatException exp) {
 			System.err.printf("Invalid port: %s", line.getOptionValue("serverPort"));
 		}
 		try {
-			if (line.getOptionValue("sslServerPort") != "")
+			if (line.getOptionValue("sslServerPort") != null)
 				sslPort = Integer.parseInt(line.getOptionValue("sslServerPort"));
 		} catch (NumberFormatException exp) {
 			System.err.printf("Invalid SSL port: %s", line.getOptionValue("sslServerPort"));
+		}
+		if (port == 0 && sslPort == 0) {
+			System.err.printf("You must specify at least one port to listen on.");
+			help();
 		}
 	}
 	
