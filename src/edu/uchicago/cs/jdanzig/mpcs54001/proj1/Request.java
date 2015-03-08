@@ -72,13 +72,23 @@ public class Request {
 	}
 	
 	public boolean persist() {
-		if (this.headers.containsKey("connection") && this.headers.get("connection").matches("keep-alive")){
+		if (this.headers.containsKey("connection") && this.headers.get("connection").toLowerCase().matches("keep-alive")){
 			return true;
 		}
 		else{
 			return false;
 		}
 		
+	}
+	
+	public int cLength() {
+		if (this.headers.containsKey("content-length")){
+			return Integer.parseInt(this.headers.get("content-length"));
+		}	
+		else
+		{
+			return 0;
+		}
 	}
 
 	public String getPath() {

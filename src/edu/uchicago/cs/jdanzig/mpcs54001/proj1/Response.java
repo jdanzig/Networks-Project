@@ -18,12 +18,16 @@ public class Response {
 		this.headers = new Hashtable<String, String>();
 		headers.put("Connection", req.persist() ? "Keep-Alive" : "Close");
 		headers.put("Date", new Date().toString());
+		headers.put("Content-Length", "0");
+		headers.put("Server", "Jon and Cody's Server");
 	}
 
 	public Response() {
 		this.headers = new Hashtable<String, String>();
 		headers.put("Connection", "Closed");
 		headers.put("Date", new Date().toString());
+		headers.put("Content-Length", "0");
+		headers.put("Server", "Jon and Cody's Server");
 	}
 
 	private boolean handleRedirect(DataOutputStream out)
@@ -47,6 +51,7 @@ public class Response {
 	private void writeHeaders(StringBuffer tempOut) {
 		for (String headerName : this.headers.keySet()) {
 			tempOut.append(String.format("%s: %s\r\n", headerName, this.headers.get(headerName)));
+			System.out.print(String.format("%s: %s\r\n", headerName, this.headers.get(headerName)));
 		}
 		tempOut.append("\r\n");
 	}
@@ -106,7 +111,7 @@ public class Response {
 			showError(out, new HTTPErrorException(500));
 		}
 	}
-	
+
 	public void showError(DataOutputStream out, HTTPErrorException exp) {
 		StringBuffer tempOut = new StringBuffer("");
 		ByteArrayOutputStream dataOut = new ByteArrayOutputStream(2000);
@@ -126,5 +131,5 @@ public class Response {
 		catch(HTTPErrorException y){
 			//showError(out, new HTTPErrorException(500));
 		}
-		}
+	}
 }

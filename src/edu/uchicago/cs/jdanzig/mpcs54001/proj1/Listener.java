@@ -35,21 +35,26 @@ public class Listener extends Thread {
 				SSLServerSocketFactory sslFactory = context.getServerSocketFactory();
 				sslServer = (SSLServerSocket) sslFactory.createServerSocket(this.port);
 				System.out.print("SECURE SOCKET ESTABLISHED\n");
-				client= sslServer.accept();
 			} else { //server is a regular old socket port, not using SSL
 				server = new ServerSocket(this.port);
 				System.out.print("STANDARD SOCKET ESTABLISHED\n");
-				client = server.accept();
+
 			}
 
 			while(running){
-				//if (this.secure) sslSession = ((SSLSocket)client).getSession();
+				if (this.secure){
+					client= sslServer.accept();
+				}
+				else{
+					client = server.accept();
+				}
 				DataOutputStream out;
 				BufferedReader in;
 				Request req = null;
 				Response resp;
 				out = new DataOutputStream(client.getOutputStream());
 				in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
 				try {
 					req = new Request(in.readLine());
 					while (req.readHeader(in.readLine())) {}
@@ -57,16 +62,15 @@ public class Listener extends Thread {
 					resp.show(out);
 					if (!req.persist()){
 						client.close();
-						if (!this.secure){
-						server.close();
-						System.out.print("CLOSED STANDARD CONNECTION\n"); 
-						}
-						else{
-							sslServer.close();
-							System.out.print("CLOSED SECURE CONNECTION\n");
-						}
-						this.run();
 					}
+					else{
+						req = new Request(in.readLine());
+						while (req.readHeader(in.readLine())) {}
+						resp = new Response(req);
+						resp.show(out);
+						client.close();
+					}
+
 				} catch (HTTPErrorException exp) {
 					System.err.printf("Respond with HTTP Error: %d\n",
 							exp.getHttpStatusCode());
@@ -77,19 +81,19 @@ public class Listener extends Thread {
 
 			}
 		} catch (IOException x) {
-			System.err.printf("1Exception: %s", x);
+			System.err.printf("Exception: %s", x);
 		}
 		catch (UnrecoverableKeyException x) {
-			System.err.printf("2Exception: %s", x);
+			System.err.printf("Exception: %s", x);
 		}
 		catch (CertificateException x) {
-			System.err.printf("3Exception: %s", x);
+			System.err.printf("Exception: %s", x);
 		}
 		catch (KeyStoreException x) {
-			System.err.printf("4Exception: %s", x);
+			System.err.printf("Exception: %s", x);
 		}
 		catch (KeyManagementException x) {
-			System.err.printf("5Exception: %s", x);
+			System.err.printf("Exception: %s", x);
 		}
 		catch (NoSuchAlgorithmException x) {
 			System.err.printf("6Exception: %s", x);
