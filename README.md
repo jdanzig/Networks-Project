@@ -9,4 +9,5 @@ I worked with a partner to complete this project. The assignment required the se
 
 The project had 2 parts. If the links are still active, the full assignment can be found here:
 Part 1: https://docs.google.com/document/d/1vEP9uByFaK9qPIlHJrq59ED2aNnAI9LubX6kKQRQ9Ew/edit
+
 Part 2: https://docs.google.com/document/d/1kcd4XLYgBfvKsHn36wmTkXINDNxswMfSb7OR8FZ8tYA/edit
